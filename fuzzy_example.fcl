@@ -1,0 +1,41 @@
+
+FUNCTION_BLOCK
+VAR_INPUT
+rakieta_w_prawo : REAL;
+rakieta_w_lewo : REAL;
+END_VAR
+VAR_OUTPUT
+moc_silnika : REAL;
+END_VAR
+
+FUZZIFY rakieta_w_prawo
+TERM bardzo_w_prawo := (0, 0) (0.5, 0.3) (0.7, 0.5) (0.8, 0.9) (0.9, 1) (1, 1);
+TERM srednio_w_prawo := (0, 0.2) (0.5, 1) (1, 0.2);
+TERM slabo_w_prawo := (0, 1) (0.1, 1) (0.2, 0.9) (0.3, 0.5) (0.5, 0.3) (1, 0);
+END_FUZZIFY
+
+FUZZIFY rakieta_w_lewo
+TERM bardzo_w_lewo := (-1, 1) (-0.9, 1) (-0.8, 0.9) (-0.7, 0.5) (-0.5, 0.3) (0, 0);
+TERM srednio_w_lewo := (-1, 0.2) (-0.5, 1) (0, 0.2);
+TERM slabo_w_lewo := (-1, 0) (-0.5, 0.3) (-0.3, 0.5) (-0.2, 0.9) (-0.1, 1) (0, 1);
+END_FUZZIFY
+
+DEFUZZIFY moc_silnika
+TERM w_lewo := (-10, 1) (-5, 1) (-4, 0.8) (0,0);
+TERM zostaw := (-5,0) (-4,0.2) (0,1) (4,0.2) (5,0);
+TERM w_prawo := (0,0) (4, 0.8) (5, 1) (10, 1);
+METHOD : COG;
+DEFAULT := 0;
+END_DEFUZZIFY
+
+RULEBLOCK first
+AND: MIN;
+ACT: MIN;
+RULE 0: IF rakieta_w_prawo IS bardzo_w_prawo AND rakieta_w_lewo IS slabo_w_lewo THEN moc_silnika IS w_lewo;
+RULE 1: IF rakieta_w_prawo IS srednio_w_prawo AND rakieta_w_lewo IS srednio_w_lewo THEN moc_silnika IS zostaw;
+RULE 2: IF rakieta_w_prawo IS srednio_w_prawo AND rakieta_w_lewo IS slabo_w_lewo THEN moc_silnika IS w_lewo;
+RULE 3: IF rakieta_w_prawo IS slabo_w_prawo AND rakieta_w_lewo IS bardzo_w_lewo THEN moc_silnika IS w_prawo;
+RULE 4: IF rakieta_w_prawo IS slabo_w_prawo AND rakieta_w_lewo IS srednio_w_lewo THEN moc_silnika IS w_prawo;
+RULE 5: IF rakieta_w_prawo IS slabo_w_prawo AND rakieta_w_lewo IS slabo_w_lewo THEN moc_silnika IS zostaw;
+END_RULEBLOCK
+END_FUNCTION_BLOCK
